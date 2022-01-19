@@ -17,14 +17,14 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - name: install sqlx-cli
-        run: cargo install sqlx-cli --no-default-features --features=rustls,sqlite
-      - name: setup db
-        run: |
-          export DATABASE_URL=sqlite://db.url
-          sqlx database create
-          sqlx migrate run
-          cp -v configuration.yaml{.example,}
+            #       - name: install sqlx-cli
+            #         run: cargo install sqlx-cli --no-default-features --features=rustls,sqlite
+            #       - name: setup db
+            #         run: |
+            #           export DATABASE_URL=sqlite://db.url
+            #           sqlx database create
+            #           sqlx migrate run
+            #           cp -v configuration.yaml{.example,}
       - uses: actions-rs/cargo@v1
         with:
           command: test
