@@ -20,6 +20,27 @@ async fn health_check_works() {
     assert_eq!(response.content_length(), Some(0));
 }
 
+#[tokio::test]
+async fn resources_returns_201_for_valid_json_data() {
+    // Arrange
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    // Act
+    let json = r#"{
+        "resource_id": "places"
+    }"#;
+    let response = client
+        .post(format!("{}/resources", &app.address))
+        .json(json)
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    // Assert
+    assert!(response.status().as_u16(), 201);
+}
+
 pub struct TestApp {
     pub address: String,
 }
