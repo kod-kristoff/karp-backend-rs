@@ -1,5 +1,30 @@
-[workspace]
-members = [
-    "libs/*",
-    "bin/*",
+[package]
+name = "karp-server"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1.15.0", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1.29"
+axum = "0.4.4"
+config = "0.11.0"
+http = "0.2.6"
+serde = { version = "1.0.133", features = ["derive"] }
+
+[dependencies.sqlx]
+version = "0.5"
+default-features = false
+features = [
+    "chrono",
+    "macros",
+    "migrate",
+    "mysql",
+    "offline",
+    "runtime-tokio-rustls",
+    "uuid",
 ]
+
+[dev-dependencies]
+reqwest = { version = "0.11.9", features = ["json"] }
