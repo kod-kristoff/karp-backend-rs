@@ -1,6 +1,11 @@
 use std::net::TcpListener;
 
-use webapp::startup;
+use sqlx::MySqlPool;
+
+use webapp::{
+    configuration::get_configuration,
+    startup
+};
 
 #[tokio::test]
 async fn health_check_works() {
@@ -21,7 +26,7 @@ async fn health_check_works() {
 }
 
 #[tokio::test]
-async fn resources_returns_201_for_valid_json_data() {
+async fn create_resource_returns_201_for_valid_json_data() {
     // Arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
@@ -38,11 +43,42 @@ async fn resources_returns_201_for_valid_json_data() {
         .expect("Failed to execute request");
 
     // Assert
-    assert!(response.status().as_u16(), 201);
+    assert_eq!(response.status().as_u16(), 201);
 }
+
+#[tokio::test]
+async fn create_resource_returns_a_400_when_data_is_missing() {
+    // Arrange
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+    let test_cases = vec![
+        ("{}", "empty data"),
+    ];
+
+    for (invalid_json, error_message) in test_cases {
+        // Act
+        let response = client
+            .post(&format!("{}/resources", &app.address))
+            .json(invalid_json)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+
+        // Assert
+        assert_eq!(
+            response.status().as_u16(),
+            400,
+            "The API did not fail with '400 Bad Request' when the payload were {}",
+            error_message
+        );
+    }
+}
+
+
 
 pub struct TestApp {
     pub address: String,
+    pub db_pool: MySqlPool,
 }
 
 async fn spawn_app() -> TestApp {
@@ -51,11 +87,18 @@ async fn spawn_app() -> TestApp {
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
+    let configuration = get_configuration().expect("Failed to read configuration");
+    let db_pool = MySqlPool::connect(&configuration.database.connection_string())
+        .await
+        .expect("Failed to connect to Mariadb");
+
+    let db_pool_clone = db_pool.clone();
     tokio::spawn(async move {
-        startup::run(listener).await
+        startup::run(listener, db_pool_clone).await
     });
 
     TestApp {
-        address
+        address,
+        db_pool,
     }
 }

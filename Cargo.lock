@@ -649,6 +649,7 @@ dependencies = [
 name = "karp-server"
 version = "0.1.0"
 dependencies = [
+ "sqlx",
  "tokio",
  "tracing",
  "webapp",
