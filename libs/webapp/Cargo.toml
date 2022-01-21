@@ -13,5 +13,18 @@ serde = { version = "1.0.133", features = ["derive"] }
 tokio = "1.15.0"
 tracing = "0.1.29"
 
+[dependencies.sqlx]
+version = "0.5"
+default-features = false
+features = [
+    "chrono",
+    "macros",
+    "migrate",
+    "mysql",
+    "offline",
+    "runtime-tokio-rustls",
+    "uuid",
+]
+
 [dev-dependencies]
 reqwest = "0.11.9"
