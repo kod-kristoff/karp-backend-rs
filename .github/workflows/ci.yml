@@ -10,6 +10,22 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mariadb:10.3
+        ports:
+          - 3306
+        env:
+          MYSQL_ROOT_PASSWORD: testing
+          MYSQL_DATABASE: karp
+          MYSQL_PASSWORD: testing
+          MYSQL_USER: karp
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1

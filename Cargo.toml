@@ -7,11 +7,21 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.15.0", features = ["macros", "rt-multi-thread"] }
-tracing = "0.1.29"
+tracing = "0.1.30"
 axum = "0.4.4"
 config = "0.11.0"
 http = "0.2.6"
-serde = { version = "1.0.133", features = ["derive"] }
+tracing-log = "0.1.2"
+tracing-bunyan-formatter = "0.3.2"
+hyper = "0.14.16"
+serde = { version = "1", features = ["derive"] }
+tower = "0.4.11"
+chrono = { version = "0.4.19", features = ["serde"] }
+uuid = { version = "0.8.2", features = ["v4", "serde"] }
+tracing-subscriber = { version = "0.3.6", features = ["env-filter"] }
+tower-http = { version = "0.2.0", features = ["trace"] }
+serde-aux = "3.0.1"
+secrecy = { version = "0.8.0", features = ["serde"] }1
 
 [dependencies.sqlx]
 version = "0.5"
@@ -27,4 +37,5 @@ features = [
 ]
 
 [dev-dependencies]
+once_cell = "1.9.0"
 reqwest = { version = "0.11.9", features = ["json"] }
