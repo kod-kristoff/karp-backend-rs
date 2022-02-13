@@ -2,10 +2,7 @@ use std::net::TcpListener;
 
 use sqlx::MySqlPool;
 
-use webapp::{
-    configuration::get_configuration,
-    startup
-};
+use webapp::{configuration::get_configuration, startup};
 
 #[tokio::test]
 async fn health_check_works() {
@@ -51,9 +48,7 @@ async fn create_resource_returns_a_400_when_data_is_missing() {
     // Arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
-    let test_cases = vec![
-        ("{}", "empty data"),
-    ];
+    let test_cases = vec![("{}", "empty data")];
 
     for (invalid_json, error_message) in test_cases {
         // Act
@@ -74,7 +69,6 @@ async fn create_resource_returns_a_400_when_data_is_missing() {
     }
 }
 
-
 use once_cell::sync::Lazy;
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
 
@@ -91,7 +85,6 @@ static TRACING: Lazy<()> = Lazy::new(|| {
     };
 });
 
-
 pub struct TestApp {
     pub address: String,
     pub db_pool: MySqlPool,
@@ -99,8 +92,7 @@ pub struct TestApp {
 
 async fn spawn_app() -> TestApp {
     Lazy::force(&TRACING);
-    let listener = TcpListener::bind("127.0.0.1:0")
-        .expect("Failed to bind random port");
+    let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
@@ -111,29 +103,22 @@ async fn spawn_app() -> TestApp {
 
     let db_pool = configure_database(&configuration.database).await;
     let db_pool_clone = db_pool.clone();
-    tokio::spawn(async move {
-        startup::run(listener, db_pool_clone).await
-    });
+    tokio::spawn(async move { startup::run(listener, db_pool_clone).await });
 
-    TestApp {
-        address,
-        db_pool,
-    }
+    TestApp { address, db_pool }
 }
-
-
 
 async fn configure_database(config: &DatabaseSettings) -> DbPool {
     use sqlx::migrate::MigrateDatabase;
 
     // Create database
-//     let mut connection = PgConnection::connect_with(&config.without_db())
-//         .await
-//         .expect("Failed to connect");
-//     connection
-//         .execute(&*format!(r#"CREATE DATABASE "{}";"#, config.database_name))
-//         .await
-//         .expect("Failed to create database");
+    //     let mut connection = PgConnection::connect_with(&config.without_db())
+    //         .await
+    //         .expect("Failed to connect");
+    //     connection
+    //         .execute(&*format!(r#"CREATE DATABASE "{}";"#, config.database_name))
+    //         .await
+    //         .expect("Failed to create database");
 
     // Migrate database
     let pool = MySqlPool::connect_with(config.with_test_db())

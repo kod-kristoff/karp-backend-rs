@@ -2,11 +2,7 @@ use std::net::TcpListener;
 
 use sqlx::MySqlPoolOptions;
 
-use webapp::{
-    configuration::get_configuration,
-    startup,
-    telemetry,
-};
+use webapp::{configuration::get_configuration, startup, telemetry};
 
 #[tokio::main]
 async fn main() {
@@ -24,7 +20,7 @@ async fn main() {
     );
     let listener = TcpListener::bind(&address).unwrap();
     tracing::info!("listening on {}", address);
-    
+
     if let Err(e) = startup::run(listener, connection_pool).await {
         eprintln!("Server error: {}", e);
     }

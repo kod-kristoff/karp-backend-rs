@@ -21,7 +21,7 @@ uuid = { version = "0.8.2", features = ["v4", "serde"] }
 tracing-subscriber = { version = "0.3.6", features = ["env-filter"] }
 tower-http = { version = "0.2.0", features = ["trace"] }
 serde-aux = "3.0.1"
-secrecy = { version = "0.8.0", features = ["serde"] }1
+secrecy = { version = "0.8.0", features = ["serde"] }
 
 [dependencies.sqlx]
 version = "0.5"

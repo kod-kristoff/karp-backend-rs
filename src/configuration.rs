@@ -1,7 +1,6 @@
-
 use secrecy::{ExposeSecret, Secret};
 use serde_aux::field_attributes::deserialize_number_from_string;
-use sqlx::mysql::{MySqlConnectOptions};
+use sqlx::mysql::MySqlConnectOptions;
 use sqlx::ConnectOptions;
 
 #[derive(serde::Deserialize)]
@@ -35,7 +34,7 @@ impl DatabaseSettings {
             self.username, self.password, self.host, self.port, self.database_name
         )
     }
-    
+
     pub fn without_db(&self) -> MySqlConnectOptions {
         MySqlConnectOptions::new()
             .host(&self.host)
