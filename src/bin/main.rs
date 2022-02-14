@@ -1,8 +1,8 @@
 use std::net::TcpListener;
 
-use sqlx::MySqlPoolOptions;
+use sqlx::mysql::MySqlPoolOptions;
 
-use webapp::{configuration::get_configuration, startup, telemetry};
+use karp_server::{configuration::get_configuration, startup, telemetry};
 
 #[tokio::main]
 async fn main() {
