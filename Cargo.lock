@@ -635,6 +635,7 @@ dependencies = [
  "axum",
  "chrono",
  "config",
+ "dotenv",
  "http",
  "hyper",
  "once_cell",

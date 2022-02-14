@@ -1,8 +1,8 @@
 use std::net::TcpListener;
 
-use sqlx::MySqlPool;
+use sqlx::{MySqlConnection, MySqlPool};
 
-use webapp::{configuration::get_configuration, startup};
+use karp_server::{configuration::{get_configuration, DatabaseSettings}, startup};
 
 #[tokio::test]
 async fn health_check_works() {
@@ -70,7 +70,7 @@ async fn create_resource_returns_a_400_when_data_is_missing() {
 }
 
 use once_cell::sync::Lazy;
-use zero2prod::telemetry::{get_subscriber, init_subscriber};
+use karp_server::telemetry::{get_subscriber, init_subscriber};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
     let default_filter_level = "info".to_string();
@@ -91,15 +91,14 @@ pub struct TestApp {
 }
 
 async fn spawn_app() -> TestApp {
+    dotenv::dotenv().ok();
+
     Lazy::force(&TRACING);
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
     let configuration = get_configuration().expect("Failed to read configuration");
-    let db_pool = MySqlPool::connect(&configuration.database.connection_string())
-        .await
-        .expect("Failed to connect to Mariadb");
 
     let db_pool = configure_database(&configuration.database).await;
     let db_pool_clone = db_pool.clone();
@@ -108,22 +107,27 @@ async fn spawn_app() -> TestApp {
     TestApp { address, db_pool }
 }
 
-async fn configure_database(config: &DatabaseSettings) -> DbPool {
+async fn configure_database(config: &DatabaseSettings) -> MySqlPool {
     use sqlx::migrate::MigrateDatabase;
+    use sqlx::{Connection, Executor};
 
     // Create database
-    //     let mut connection = PgConnection::connect_with(&config.without_db())
-    //         .await
-    //         .expect("Failed to connect");
-    //     connection
-    //         .execute(&*format!(r#"CREATE DATABASE "{}";"#, config.database_name))
-    //         .await
-    //         .expect("Failed to create database");
+    let mut connection = MySqlConnection::connect_with(&config.without_db())
+        .await
+        .expect("Failed to connect");
+    connection
+        .execute(&*format!(r#"DROP DATABASE IF EXISTS `{}`;"#, config.test_database_name))
+        .await
+        .expect("Failed to drop test database");
+    connection
+        .execute(&*format!(r#"CREATE DATABASE `{}`;"#, config.test_database_name))
+        .await
+        .expect("Failed to create test database");
 
     // Migrate database
     let pool = MySqlPool::connect_with(config.with_test_db())
         .await
-        .expect("Failed to connect to Postgres.");
+        .expect("Failed to connect to Mariadb.");
     sqlx::migrate!("./migrations")
         .run(&pool)
         .await
