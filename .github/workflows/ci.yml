@@ -14,12 +14,12 @@ jobs:
       mysql:
         image: mariadb:10.3
         ports:
-          - 3306
+          - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: testing
-          MYSQL_DATABASE: karp
-          MYSQL_PASSWORD: testing
-          MYSQL_USER: karp
+          MYSQL_DATABASE: karp_test
+          MYSQL_PASSWORD: password
+          MYSQL_USER: mariadb
         options: >-
           --health-cmd "mysqladmin ping"
           --health-interval 10s
