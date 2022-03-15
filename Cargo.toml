@@ -30,7 +30,7 @@ features = [
     "chrono",
     "macros",
     "migrate",
-    "mysql",
+    "postgres",
     "offline",
     "runtime-tokio-rustls",
     "uuid",

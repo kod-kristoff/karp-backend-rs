@@ -1,6 +1,6 @@
 use std::net::TcpListener;
 
-use sqlx::{MySqlConnection, MySqlPool};
+use sqlx::{PgConnection, PgPool};
 
 use karp_server::{configuration::{get_configuration, DatabaseSettings}, startup};
 
@@ -87,7 +87,7 @@ static TRACING: Lazy<()> = Lazy::new(|| {
 
 pub struct TestApp {
     pub address: String,
-    pub db_pool: MySqlPool,
+    pub db_pool: PgPool,
 }
 
 async fn spawn_app() -> TestApp {
@@ -98,7 +98,8 @@ async fn spawn_app() -> TestApp {
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
-    let configuration = get_configuration().expect("Failed to read configuration");
+    let mut configuration = get_configuration().expect("Failed to read configuration");
+    configuration.database.database_name = uuid::Uuid::new_v4().to_string();
 
     let db_pool = configure_database(&configuration.database).await;
     let db_pool_clone = db_pool.clone();
@@ -107,25 +108,21 @@ async fn spawn_app() -> TestApp {
     TestApp { address, db_pool }
 }
 
-async fn configure_database(config: &DatabaseSettings) -> MySqlPool {
+async fn configure_database(config: &DatabaseSettings) -> PgPool {
     use sqlx::migrate::MigrateDatabase;
     use sqlx::{Connection, Executor};
 
     // Create database
-    let mut connection = MySqlConnection::connect_with(&config.without_db())
+    let mut connection = PgConnection::connect_with(&config.without_db())
         .await
         .expect("Failed to connect");
     connection
-        .execute(&*format!(r#"DROP DATABASE IF EXISTS `{}`;"#, config.test_database_name))
-        .await
-        .expect("Failed to drop test database");
-    connection
-        .execute(&*format!(r#"CREATE DATABASE `{}`;"#, config.test_database_name))
+        .execute(&*format!(r#"CREATE DATABASE "{}";"#, config.test_database_name))
         .await
         .expect("Failed to create test database");
 
     // Migrate database
-    let pool = MySqlPool::connect_with(config.with_test_db())
+    let pool = PgPool::connect_with(config.with_test_db())
         .await
         .expect("Failed to connect to Mariadb.");
     sqlx::migrate!("./migrations")

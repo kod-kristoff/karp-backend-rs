@@ -1,6 +1,6 @@
 use secrecy::{ExposeSecret, Secret};
 use serde_aux::field_attributes::deserialize_number_from_string;
-use sqlx::mysql::MySqlConnectOptions;
+use sqlx::postgres::PgConnectOptions;
 use sqlx::ConnectOptions;
 
 #[derive(serde::Deserialize)]
@@ -30,7 +30,7 @@ pub struct DatabaseSettings {
 impl DatabaseSettings {
     pub fn connection_string(&self) -> String {
         format!(
-            "mysql://{}:{}@{}:{}/{}",
+            "postgres://{}:{}@{}:{}/{}",
             self.username,
             self.password.expose_secret(),
             self.host,
@@ -39,21 +39,21 @@ impl DatabaseSettings {
         )
     }
 
-    pub fn without_db(&self) -> MySqlConnectOptions {
-        MySqlConnectOptions::new()
+    pub fn without_db(&self) -> PgConnectOptions {
+        PgConnectOptions::new()
             .host(&self.host)
             .username(&self.username)
             .password(self.password.expose_secret())
             .port(self.port)
     }
 
-    pub fn with_db(&self) -> MySqlConnectOptions {
+    pub fn with_db(&self) -> PgConnectOptions {
         let mut options = self.without_db().database(&self.database_name);
         options.log_statements(tracing::log::LevelFilter::Trace);
         options
     }
 
-    pub fn with_test_db(&self) -> MySqlConnectOptions {
+    pub fn with_test_db(&self) -> PgConnectOptions {
         let mut options = self.without_db().database(&self.test_database_name);
         options.log_statements(tracing::log::LevelFilter::Trace);
         options

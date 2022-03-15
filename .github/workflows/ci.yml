@@ -12,19 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mariadb:10.3
+        image: postgresql:12
         ports:
-          - 3306:3306
+          - 5432:5432
         env:
-          MYSQL_ROOT_PASSWORD: testing
-          MYSQL_DATABASE: karp_test
-          MYSQL_PASSWORD: password
-          MYSQL_USER: mariadb
-        options: >-
-          --health-cmd "mysqladmin ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: postgres
 
     steps:
       - uses: actions/checkout@v2
