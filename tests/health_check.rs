@@ -44,7 +44,7 @@ async fn create_resource_returns_201_for_valid_json_data() {
 }
 
 #[tokio::test]
-async fn create_resource_returns_a_400_when_data_is_missing() {
+async fn create_resource_returns_a_422_when_data_is_missing() {
     // Arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
@@ -63,7 +63,7 @@ async fn create_resource_returns_a_400_when_data_is_missing() {
         assert_eq!(
             response.status().as_u16(),
             400,
-            "The API did not fail with '400 Bad Request' when the payload were {}",
+            "The API did not fail with '422 Unprocessable Entity' when the payload were {}",
             error_message
         );
     }
