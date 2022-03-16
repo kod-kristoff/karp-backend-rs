@@ -2,7 +2,10 @@ use std::net::TcpListener;
 
 use sqlx::{PgConnection, PgPool};
 
-use karp_server::{configuration::{get_configuration, DatabaseSettings}, startup};
+use karp_server::{
+    configuration::{get_configuration, DatabaseSettings},
+    startup,
+};
 
 #[tokio::test]
 async fn health_check_works() {
@@ -62,15 +65,15 @@ async fn create_resource_returns_a_422_when_data_is_missing() {
         // Assert
         assert_eq!(
             response.status().as_u16(),
-            400,
+            422,
             "The API did not fail with '422 Unprocessable Entity' when the payload were {}",
             error_message
         );
     }
 }
 
-use once_cell::sync::Lazy;
 use karp_server::telemetry::{get_subscriber, init_subscriber};
+use once_cell::sync::Lazy;
 
 static TRACING: Lazy<()> = Lazy::new(|| {
     let default_filter_level = "info".to_string();
