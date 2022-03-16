@@ -12,7 +12,7 @@ CREATE TABLE resources
     name VARCHAR(100) NOT NULL,
     config JSONB NOT NULL,
     is_published BOOLEAN,
-    last_modified DOUBLE NOT NULL,
+    last_modified DOUBLE PRECISION NOT NULL,
     last_modified_by VARCHAR(100) NOT NULL,
     message VARCHAR(100) NOT NULL,
     -- op ENUM('ADDED', 'UPDATED', 'DELETED') NOT NULL,
