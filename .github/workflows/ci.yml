@@ -20,21 +20,52 @@ jobs:
           POSTGRES_PASSWORD: password
           POSTGRES_USER: postgres
 
+    env:
+      SQLX_VERSION: 0.5.11
+      SQLX_DB: postgres
+      SQLX_RUNTIME: rustls
+
     steps:
       - uses: actions/checkout@v2
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
-            #       - name: install sqlx-cli
-            #         run: cargo install sqlx-cli --no-default-features --features=rustls,sqlite
-            #       - name: setup db
-            #         run: |
-            #           export DATABASE_URL=sqlite://db.url
-            #           sqlx database create
-            #           sqlx migrate run
-            #           cp -v configuration.yaml{.example,}
+      # - name: Cache sqlx-cli
+      #   uses: actions/cache@v2
+      #   id: cache-sqlx
+      #   with:
+      #     path: |
+      #       ~/.cargo/bin/sqlx
+      #       ~/.cargo/bin/cargo-sqlx
+      #     key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}-${{ env.SQLX_RUNTIME }}-${{ env.SQLX_DB }}
+
+      # - name: Install sqlx-cli
+      #   uses: actions-rs/cargo@v1
+      #   if: steps.cache-sqlx.outputs.cache-hit == false
+      #   with:
+      #     command: install
+      #     args: >
+      #       sqlx-cli
+      #       --force
+      #       --version=${{ env.SQLX_VERSION }}
+      #       --features=${{ env.SQLX_DB }},${{ env.SQLX_RUNTIME }}
+      #       --no-default-features
+      #       --locked
+      # - name: Migrate database
+      #   run: |
+      #     sudo apt-get install libpq-dev -y
+      #     SKIP_DOCKER=true ./scripts/init_db.sh
       - uses: actions-rs/cargo@v1
         with:
           command: test
@@ -85,4 +116,4 @@ jobs:
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
-          args: '--ignore-tests'
+          args: "--ignore-tests"
