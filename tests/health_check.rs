@@ -122,7 +122,7 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to create test database");
 
     // Migrate database
-    let pool = PgPool::connect_with(config.with_test_db())
+    let pool = PgPool::connect_with(config.with_db())
         .await
         .expect("Failed to connect to Mariadb.");
     sqlx::migrate!("./migrations")
