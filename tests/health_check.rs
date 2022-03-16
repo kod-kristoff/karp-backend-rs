@@ -46,7 +46,7 @@ async fn create_resource_returns_201_for_valid_json_data() {
     assert_eq!(response.status().as_u16(), 201);
 
     let saved = sqlx::query("SELECT resource_id FROM resources")
-    	.fetch_one(app.pool)
+    	.fetch_one(app.db_pool)
     	.await
     	.expect("Failed to fetch saved resource.");
 
