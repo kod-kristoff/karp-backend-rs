@@ -117,7 +117,7 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .await
         .expect("Failed to connect");
     connection
-        .execute(&*format!(r#"CREATE DATABASE "{}";"#, config.test_database_name))
+        .execute(&*format!(r#"CREATE DATABASE "{}";"#, config.database_name))
         .await
         .expect("Failed to create test database");
 
