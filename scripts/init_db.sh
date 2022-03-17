@@ -4,8 +4,8 @@ set -eo pipefail
 
 if ! [ -x "$(command -v psql)" ]; then
   echo >&2 "Error: psql is not installed."
-exit 1
-# fi
+  exit 1
+fi
 
 if ! [ -x "$(command -v sqlx)" ]; then
   echo >&2 "Error: sqlx is not installed."
@@ -23,6 +23,8 @@ DB_PASSWORD="${POSTGRES_PASSWORD:=password}"
 DB_NAME="${POSTGRES_DB:=karp}"
 # Check if a custom port has been set, otherwise default to '5432'
 DB_PORT="${POSTGRES_PORT:=25434}"
+# Check if a custom host has been set, otherwise default to 'localhost'
+DB_HOST="${POSTGRES_HOST:=localhost}"
 
 # Allow to skip Docker if a dockerized Postgres database is already running
 if [[ -z "${SKIP_DOCKER}" ]]
@@ -45,24 +47,6 @@ then
       postgres -N 1000
       # ^ Increased maximum number of connections for testing purposes
 fi
-
-function is_mysql_alive() {
-  docker exec -it mariadb_karp_rs \
-    mysqladmin ping \
-      --user="${DB_USER}" \
-      --password="${DB_PASSWORD}" \
-      --host=${CONTAINER_DB_HOST} \
-      --port=${DB_PORT} \
-    > /dev/null
-  returned_value=$?
-  echo "${returned_value}"
-}
-
-until [ "$(is_mysql_alive)" -eq 0 ]
-do
-  sleep 2
-  echo "Waiting for MySQL to be ready..."
-done
 
 # Keep pinging Postgres until it's ready to accept commands
 until PGPASSWORD="${DB_PASSWORD}" psql -h "${DB_HOST}" -U "${DB_USER}" -p "${DB_PORT}" -d "postgres" -c '\q'; do
