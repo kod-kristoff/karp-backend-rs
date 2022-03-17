@@ -3,7 +3,7 @@
 -- Create resources table
 CREATE TABLE resources
 (
-    history_id INTEGER NOT NULL PRIMARY KEY,
+    history_id BIGSERIAL PRIMARY KEY,
     entity_id UUID NOT NULL,
     resource_id VARCHAR(64) NOT NULL,
     resource_type VARCHAR(32) NOT NULL,
@@ -11,8 +11,8 @@ CREATE TABLE resources
     version INT NOT NULL,
     name VARCHAR(100) NOT NULL,
     config JSONB NOT NULL,
-    is_published BOOLEAN,
-    last_modified DOUBLE PRECISION NOT NULL,
+    -- is_published BOOLEAN,
+    last_modified TIMESTAMP NOT NULL,
     last_modified_by VARCHAR(100) NOT NULL,
     message VARCHAR(100) NOT NULL,
     -- op ENUM('ADDED', 'UPDATED', 'DELETED') NOT NULL,
