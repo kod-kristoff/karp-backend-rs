@@ -41,7 +41,7 @@ async fn create_resource_returns_201_for_valid_json_data() {
         .send()
         .await
         .expect("Failed to execute request");
-
+    println!("Response content is {}", response.text().await.expect("Failed"));
     // Assert
     assert_eq!(response.status().as_u16(), 201);
 
