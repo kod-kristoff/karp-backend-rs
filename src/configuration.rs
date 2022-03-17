@@ -61,13 +61,9 @@ impl DatabaseSettings {
 }
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
-    let mut settings = config::Config::default();
 
     let base_path = std::env::current_dir().expect("Failed to determine current directory");
     let configuration_directory = base_path.join("configuration");
-
-    // Read the "default" configuration file
-    settings.merge(config::File::from(configuration_directory.join("base")).required(true))?;
 
     // Detect the running environment
     let environment: Environment = std::env::var("KARP_ENVIRONMENT")
@@ -75,14 +71,17 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
         .try_into()
         .expect("Failed to parse KARP_ENVIRONMENT");
 
-    // Layer on the environment-specific values.
-    settings.merge(
-        config::File::from(configuration_directory.join(environment.as_str())).required(true),
-    )?;
+    let settings = config::Config::builder()
+        // Read the "default" configuration file
+        .add_source(config::File::from(configuration_directory.join("base")).required(true))
+        // Layer on the environment-specific values.
+        .add_source(
+            config::File::from(configuration_directory.join(environment.as_str())).required(true),
+        )
+        .add_source(config::Environment::with_prefix("karp").separator("__"))
+        .build()?;
 
-    settings.merge(config::Environment::with_prefix("karp").separator("__"))?;
-
-    settings.try_into()
+    settings.try_deserialize()
 }
 
 pub enum Environment {
