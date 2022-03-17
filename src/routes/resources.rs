@@ -1,6 +1,6 @@
 use axum::extract::{Extension, Json};
 use http::StatusCode;
-use sqlx::{self, types::Json, PgPool};
+use sqlx::{self, types::Json as SqlJson, PgPool};
 
 use uuid::Uuid;
 use ulid::Ulid;
@@ -8,6 +8,11 @@ use ulid::Ulid;
 #[derive(serde::Deserialize)]
 pub struct ResourceCreate {
     resource_id: String,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
+pub struct ResourceConfig {
+    pub id: String
 }
 
 pub async fn create_resource(
@@ -18,7 +23,7 @@ pub async fn create_resource(
 	let entry_repo_id: Uuid = Ulid::new().into();
 	let version: u32 = 1;
 	let name = String::from(&data.resource_id);
-	let config = Json::new();
+	let config = SqlJson(ResourceConfig { id: "field".into() });
 	let now = chrono::Utc::now();
 	let query = "INSERT INTO resources
 		(entity_id, resource_id, resource_type, entry_repo_id, version, name, config, last_modified, last_modified_by, message, discarded)
