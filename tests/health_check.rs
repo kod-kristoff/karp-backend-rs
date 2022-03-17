@@ -42,14 +42,17 @@ async fn create_resource_returns_201_for_valid_json_data() {
         .await
         .expect("Failed to execute request");
     let response_status = response.status().as_u16();
-    println!("Response content is {}", response.text().await.expect("Failed"));
+    println!(
+        "Response content is {}",
+        response.text().await.expect("Failed")
+    );
     // Assert
     assert_eq!(response_status, 201);
 
     let saved: (String,) = sqlx::query_as("SELECT resource_id FROM resources")
-    	.fetch_one(&app.db_pool)
-    	.await
-    	.expect("Failed to fetch saved resource.");
+        .fetch_one(&app.db_pool)
+        .await
+        .expect("Failed to fetch saved resource.");
 
     assert_eq!(saved.0, "places");
 }

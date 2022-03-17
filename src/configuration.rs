@@ -61,7 +61,6 @@ impl DatabaseSettings {
 }
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
-
     let base_path = std::env::current_dir().expect("Failed to determine current directory");
     let configuration_directory = base_path.join("configuration");
 
