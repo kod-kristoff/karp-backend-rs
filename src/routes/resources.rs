@@ -16,7 +16,7 @@ pub async fn create_resource(
 ) -> StatusCode {
 	let entity_id: Uuid = Ulid::new().into();
 	let entry_repo_id: Uuid = Ulid::new().into();
-	let version = 1;
+	let version: u32 = 1;
 	let name = String::from(&data.resource_id);
 	let config = Json::new();
 	let now = chrono::Utc::now();
