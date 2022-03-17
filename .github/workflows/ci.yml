@@ -103,6 +103,16 @@ jobs:
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: postgres:12
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: postgres
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -116,4 +126,16 @@ jobs:
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
+          version: "0.19.1"
           args: "--ignore-tests"
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v2
+        with:
+          verbose: true
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v1
+        with:
+          name: code-coverage-report
+          path: cobertura.xml
