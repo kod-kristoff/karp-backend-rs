@@ -45,12 +45,12 @@ async fn create_resource_returns_201_for_valid_json_data() {
     // Assert
     assert_eq!(response.status().as_u16(), 201);
 
-    let saved = sqlx::query("SELECT resource_id FROM resources")
+    let saved: (&str,) = sqlx::query("SELECT resource_id FROM resources")
     	.fetch_one(&app.db_pool)
     	.await
     	.expect("Failed to fetch saved resource.");
 
-    assert_eq!(saved.resource_id, "places");
+    assert_eq!(saved.0, "places");
 }
 
 #[tokio::test]
