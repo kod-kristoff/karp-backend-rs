@@ -53,6 +53,8 @@ jobs:
           command: build
           args: --release
 
+      - name: Display files
+        run: tree target
       - name: Prepare archive
         run: |
           strip target/release/karp-server
